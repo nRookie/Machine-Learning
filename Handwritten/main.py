@@ -34,62 +34,62 @@ class MnistDataset(nn.Module):
     pass
 
 class Discriminator(nn.Module):
-	def __init__(self):
-		# initialise parent pytorch class
-		super().__init__()
+    def __init__(self):
+        # initialise parent pytorch class
+        super().__init__()
 
-		# define neural network layers
-		self.model = nn.Sequential(
-			nn.Linear(784, 200),
-			nn.Sigmoid(),
-			nn.Linear(200, 1),
-			nn.Sigmoid()
-		)
+        # define neural network layers
+        self.model = nn.Sequential(
+            nn.Linear(784, 200),
+            nn.Sigmoid(),
+            nn.Linear(200, 1),
+            nn.Sigmoid()
+        )
 
 
-		# create loss function
-		self.loss_function = nn.MSELoss()
-		
+        # create loss function
+        self.loss_function = nn.MSELoss()
+        
 
-		# create optimiser, using stochastic gradient descent
-		self.optimiser = torch.optim.SGD(self.parameters(), lr=0.01)
+        # create optimiser, using stochastic gradient descent
+        self.optimiser = torch.optim.SGD(self.parameters(), lr=0.01)
 
-		# counter and accumulator for progress
-		self.counter = 0
-		self.progress = []
-		pass
+        # counter and accumulator for progress
+        self.counter = 0
+        self.progress = []
+        pass
 
-	def forward(self, inputs):
-		# simple run model
-		return self.model(inputs)
+    def forward(self, inputs):
+        # simple run model
+        return self.model(inputs)
 
-	def train(self, inputs, targets):
-		# calculate the output of the network 
-		outputs = self.forward(inputs)
-		# calculate loss
-		loss = self.loss_function(outputs, targets)
+    def train(self, inputs, targets):
+        # calculate the output of the network 
+        outputs = self.forward(inputs)
+        # calculate loss
+        loss = self.loss_function(outputs, targets)
 
-		# increase counter and accumulate error ever 10 epochs
+        # increase counter and accumulate error ever 10 epochs
 
-		self.counter += 1
-		if (self.counter % 10 == 0 ):
-			self.progress.append(loss.item())
-			pass
-		if (self.counter % 10000 == 0):
-			print("counter = ", self.counter)
-			pass
-		
-		# zero gradients, perform a backward pass, update weights
-		self.optimiser.zero_grad()
-		loss.backward()
-		self.optimiser.step()
+        self.counter += 1
+        if (self.counter % 10 == 0 ):
+            self.progress.append(loss.item())
+            pass
+        if (self.counter % 10000 == 0):
+            print("counter = ", self.counter)
+            pass
+        
+        # zero gradients, perform a backward pass, update weights
+        self.optimiser.zero_grad()
+        loss.backward()
+        self.optimiser.step()
 
-		pass
+        pass
 
-	def plot_progress(self):
-		df = pandas.DataFrame(self.progress, columns=['loss'])
-		df.plot(ylim=(0, 1.0), figsize=(16,8), alpha=0.1, marker='.', grid=True, yticks=(0, 0.25, 0.5))
-		pass
+    def plot_progress(self):
+        df = pandas.DataFrame(self.progress, columns=['loss'])
+        df.plot(ylim=(0, 1.0), figsize=(16,8), alpha=0.1, marker='.', grid=True, yticks=(0, 0.25, 0.5))
+        pass
 
 
 
@@ -163,27 +163,33 @@ def generate_random(size):
     random_data = torch.rand(size)
     return random_data
 
-# G = Generator()
-# output = G.forward(generate_random(1))
-# img = output.detach().numpy().reshape(28,28)
-# plt.imshow(img,interpolation='none', cmap='Blues')
-# plt.show()
-# # for label, image_data_tensor, target_tensor in mnist_dataset:
-# #     # real data
-# #     D.train(image_data_tensor, torch.FloatTensor([1.0]))
-# #     # fake data
-# #     D.train(generate_random(784), torch.FloatTensor([0.0]))
-# #     pass
+# create Discriminator and Generator
 
+D = Discriminator()
+G = Generator()
 
-# # D.plot_progress()
+# train Discriminator and Generator
 
+for label, image_data_tensor, target_tensor in mnist_dataset:
 
-# # for i in range(4):
-# #   image_data_tensor = mnist_dataset[random.randint(0,60000)][1]
-# #   print( D.forward( image_data_tensor ).item() )
-# #   pass
+    # train discriminator on true
+    D.train(image_data_tensor, torch.FloatTensor([1.0]))
 
-# # for i in range(4):
-# #   print( D.forward( generate_random(784) ).item() )
-# #   pass
+    # train discriminator on false
+    # use detach() so gradients in G are not calculated
+    D.train(G.forward(generate_random(1)).detach(), torch.FloatTensor([0.0]))
+    
+    # train generator
+    G.train(D, generate_random(1), torch.FloatTensor([1.0]))
+
+    pass
+
+# plot a 3 column, 2 row array of generated images
+f, axarr = plt.subplots(2,3, figsize=(16,8))
+for i in range(2):
+    for j in range(3):
+        output = G.forward(generate_random(1))
+        img = output.detach().numpy().reshape(28,28)
+        axarr[i,j].imshow(img, interpolation='none', cmap='Blues')
+        pass
+    pass
