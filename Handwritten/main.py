@@ -41,18 +41,20 @@ class Discriminator(nn.Module):
         # define neural network layers
         self.model = nn.Sequential(
             nn.Linear(784, 200),
-            nn.Sigmoid(),
+            nn.LeakyReLU(0.02),
+
+            nn.LayerNorm(200),
+
             nn.Linear(200, 1),
             nn.Sigmoid()
         )
 
 
         # create loss function
-        self.loss_function = nn.MSELoss()
-        
+        self.loss_function = nn.BCELoss()
 
         # create optimiser, using stochastic gradient descent
-        self.optimiser = torch.optim.SGD(self.parameters(), lr=0.01)
+        self.optimiser = torch.optim.Adam(self.parameters(), lr=0.0001)
 
         # counter and accumulator for progress
         self.counter = 0
@@ -102,13 +104,16 @@ class Generator(nn.Module):
         # define neural network layers
         self.model = nn.Sequential(
             nn.Linear(1, 200),
-            nn.Sigmoid(),
+            nn.LeakyReLU(0.02),
+
+            nn.LayerNorm(200),
+
             nn.Linear(200, 784),
             nn.Sigmoid()
         )
 
         # create optimiser, simple stochastic gradient descent
-        self.optimiser = torch.optim.SGD(self.parameters(), lr=0.01)
+        self.optimiser = torch.optim.Adam(self.parameters(), lr=0.0001)
 
         # counter and accumulator for progress
         self.counter = 0
@@ -159,8 +164,13 @@ mnist_dataset = MnistDataset('../mnist_train.csv')
 mnist_dataset.plot_image(17)
 
 
-def generate_random(size):
+def generate_random_image(size):
     random_data = torch.rand(size)
+    return random_data
+
+
+def generate_random_seed(size):
+    random_data = torch.randn(size)
     return random_data
 
 # create Discriminator and Generator
@@ -177,10 +187,10 @@ for label, image_data_tensor, target_tensor in mnist_dataset:
 
     # train discriminator on false
     # use detach() so gradients in G are not calculated
-    D.train(G.forward(generate_random(1)).detach(), torch.FloatTensor([0.0]))
+    D.train(G.forward(generate_random_seed(100)).detach(), torch.FloatTensor([0.0]))
     
     # train generator
-    G.train(D, generate_random(1), torch.FloatTensor([1.0]))
+    G.train(D, generate_random_seed(100), torch.FloatTensor([1.0]))
 
     pass
 
@@ -188,8 +198,11 @@ for label, image_data_tensor, target_tensor in mnist_dataset:
 f, axarr = plt.subplots(2,3, figsize=(16,8))
 for i in range(2):
     for j in range(3):
-        output = G.forward(generate_random(1))
+        output = G.forward(generate_random_image(100))
         img = output.detach().numpy().reshape(28,28)
         axarr[i,j].imshow(img, interpolation='none', cmap='Blues')
         pass
     pass
+
+
+plt.show()
