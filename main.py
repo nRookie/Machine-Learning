@@ -3,6 +3,7 @@ import matplotlib.pyplot
 
 # scipy.special for the sigmoid function expit()
 import scipy.special
+import scipy.misc
 
 # neural network class definition
 class neuralNetwork:
@@ -337,4 +338,48 @@ def epoch_whole_set():
     print ("performance = ", scorecard_array.sum() / scorecard_array.size)
     print ("performance percentage = ", (scorecard_array.sum() / scorecard_array.size)*100,"%")
 
-epoch_whole_set()
+# epoch_whole_set()
+
+
+def test_own_file(image_file_name):
+    input_nodes = 784
+    hidden_nodes = 100
+    output_nodes = 10
+
+    learning_rate = 0.25
+
+    # create instance of neural network
+    n = neuralNetwork(input_nodes, hidden_nodes, output_nodes, learning_rate)
+
+    # load the mnist training data CSV file into a list
+
+    training_data_file = open("mnist_train.csv", 'r')
+    training_data_list = training_data_file.readlines()
+    training_data_file.close()
+    epochs = 2
+    # train the neural network
+    for e in range(epochs):
+        for record in training_data_list:
+            # split the record by the ',' commas
+            all_values = record.split(',')
+            # scale and shift the inputs
+            inputs = (numpy.asfarray(all_values[1:]) / 255.0 * 0.99) + 0.01
+            targets = numpy.zeros(output_nodes) + 0.01
+            # all_values[0] is the target label for this record 
+            targets[int(all_values[0])] = 0.99
+            n.train(inputs, targets)
+        pass
+    pass
+    scorecard =[]
+
+    img_array = scipy.misc.imread(image_file_name, flatten=True)
+
+    img_data  = 255.0 - img_array.reshape(784)
+    img_data = (img_data / 255.0 * 0.99) + 0.01
+
+    outputs = n.query(img_data)
+        # the index of the highest value corresponds to the label
+    label = numpy.argmax(outputs)
+    print(label)
+
+test_own_file("3.png")
