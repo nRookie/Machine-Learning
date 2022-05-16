@@ -180,7 +180,7 @@ G = Generator()
 
 # train Discriminator and Generator
 
-epochs = 4
+epochs = 16
 
 for epoch in range(epochs):
     print("epoch = ", epoch + 1)
