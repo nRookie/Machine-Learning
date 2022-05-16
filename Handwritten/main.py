@@ -180,17 +180,21 @@ G = Generator()
 
 # train Discriminator and Generator
 
-for label, image_data_tensor, target_tensor in mnist_dataset:
+epochs = 4
 
-    # train discriminator on true
-    D.train(image_data_tensor, torch.FloatTensor([1.0]))
+for epoch in range(epochs):
+    print("epoch = ", epoch + 1)
+    for label, image_data_tensor, target_tensor in mnist_dataset:
 
-    # train discriminator on false
-    # use detach() so gradients in G are not calculated
-    D.train(G.forward(generate_random_seed(100)).detach(), torch.FloatTensor([0.0]))
-    
-    # train generator
-    G.train(D, generate_random_seed(100), torch.FloatTensor([1.0]))
+        # train discriminator on true
+        D.train(image_data_tensor, torch.FloatTensor([1.0]))
+
+        # train discriminator on false
+        # use detach() so gradients in G are not calculated
+        D.train(G.forward(generate_random_seed(100)).detach(), torch.FloatTensor([0.0]))
+        
+        # train generator
+        G.train(D, generate_random_seed(100), torch.FloatTensor([1.0]))
 
     pass
 
