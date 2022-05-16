@@ -103,7 +103,7 @@ class Generator(nn.Module):
         
         # define neural network layers
         self.model = nn.Sequential(
-            nn.Linear(1, 200),
+            nn.Linear(100, 200),
             nn.LeakyReLU(0.02),
 
             nn.LayerNorm(200),
