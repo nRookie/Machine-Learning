@@ -22,35 +22,33 @@ def generate_random_seed(size):
     return random_data
 
 D = Discriminator()
-print("Discriminator:\n", D)
+G = Generator()
 
-print("Training the discriminator")
-for label, image_data_tensor, target_tensor in fmnist_dataset:
-    # real data
-    D.train(image_data_tensor, torch.FloatTensor([1.0]))
-    # fake data
-    D.train(generate_random_image(784), torch.FloatTensor([0.0]))
+epochs = 4 
 
-print("Checking the discriminator output")
-print("The real input:\n")
+for epoch in range(epochs):
+    print("epoch = ", epoch + 1)
+    # train Discriminator and Generator
+    for label, image_data_tensor, target_tensor in fmnist_dataset:
+        # train discriminator on true
+        D.train(image_data_tensor, torch.FloatTensor([1.0]))
 
-for i in range(4):
-    image_data_tensor = fmnist_dataset[random.randint(0,140)][1]
-    print( D.forward( image_data_tensor).item())
-    pass
+        # train discriminator on false
+        # use detach() so gradients in G are not calculated
+        D.train(D, generate_random_seed(100), torch.FloatTensor([1.0]))
 
-
-print("Checking the discriminator output")
-print("The real input:\n")
-
-for i in range(4):
-    image_data_tensor = fmnist_dataset[random.randint(0, 140)][1]
-    print( D.forward( image_data_tensor).item())
-    pass
+        pass
 
 
-print("The fake input:\n")
+# plot several outputs from the trained generator
+# plot a 3 column, 2 row array of generated images
 
-for i in range(4):
-    print( D.forward( generate_random_image(784)).item())
+f, axarr = plt.subplots(2,3, figsize=(16, 8))
+
+for i in range(2):
+    for j in range(3):
+        output = G.forward(generate_random_seed(100))
+        img = output.detach().numpy().reshape(28,28)
+        axarr[i,j].imshow(img, interpolation='none', cmap='Blues')
+        pass
     pass
