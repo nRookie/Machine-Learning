@@ -66,3 +66,16 @@ class Discriminator(nn.Module):
         )
 
 ```
+
+
+
+# errors
+
+https://kontext.tech/article/915/torchvision-error-could-not-find-module-imagepyd
+
+
+
+# install 
+https://www.yisu.com/zixun/608015.html
+
+https://discuss.pytorch.org/t/pytorch-cuda-11-6/149647
