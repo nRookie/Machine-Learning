@@ -12,58 +12,55 @@ class View(nn.Module):
     def forward(self, x):
         return x.view(*self.shape)
 
-
-class Discriminator(nn.Module):
+class Generator(nn.Module):
+    
     def __init__(self):
         # initialise parent pytorch class
         super().__init__()
-
+        
         # define neural network layers
         self.model = nn.Sequential(
-            View(218*178*3),
-
-            nn.Linear(3 * 218 * 178, 100),
+            nn.Linear(100, 3 * 10 * 10),
             nn.LeakyReLU(),
 
-            nn.LayerNorm(100),
+            nn.LayerNorm(3 * 10 * 10),
 
-            nn.Linear(100, 1),
-            nn.Sigmoid()
+            nn.Linear(3 * 10 * 10, 3 * 218 * 178),
+
+            nn.Sigmoid(),
+            View((218, 178, 3))
         )
 
-
-
-        # create loss function
-        self.loss_function = nn.BCELoss()
-
-        # create optimiser, using stochastic gradient descent
+        # create optimiser, simple stochastic gradient descent
         self.optimiser = torch.optim.Adam(self.parameters(), lr=0.0001)
 
         # counter and accumulator for progress
         self.counter = 0
         self.progress = []
+        
         pass
-
-    def forward(self, inputs):
-        # simple run model
+    
+    
+    def forward(self, inputs):        
+        # simply run model
         return self.model(inputs)
 
-    def train(self, inputs, targets):
-        # calculate the output of the network 
-        outputs = self.forward(inputs)
-        # calculate loss
-        loss = self.loss_function(outputs, targets)
+    def train(self, D, inputs, targets):
+        # calculate the output of the network
+        g_output = self.forward(inputs)
+            
+        # pass onto Discriminator
+        d_output = D.forward(g_output)
+            
+        # calculate error
+        loss = D.loss_function(d_output, targets)
 
-        # increase counter and accumulate error ever 10 epochs
-
+        # increase counter and accumulate error every 10
         self.counter += 1
-        if (self.counter % 10 == 0 ):
+        if (self.counter % 10 == 0):
             self.progress.append(loss.item())
             pass
-        if (self.counter % 10000 == 0):
-            print("counter = ", self.counter)
-            pass
-        
+
         # zero gradients, perform a backward pass, update weights
         self.optimiser.zero_grad()
         loss.backward()
@@ -75,3 +72,5 @@ class Discriminator(nn.Module):
         df = pandas.DataFrame(self.progress, columns=['loss'])
         df.plot(ylim=(0, 1.0), figsize=(16,8), alpha=0.1, marker='.', grid=True, yticks=(0, 0.25, 0.5))
         pass
+
+
