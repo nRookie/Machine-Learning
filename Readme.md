@@ -112,3 +112,56 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 D.to(device)
 ```
+
+
+### We can see that there is a change in nvidia-smi
+
+``` shell
+(pytorch-pip) [root@10-9-151-144 HumanFace]# nvidia-smi
+Thu May 26 21:10:41 2022       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 510.47.03    Driver Version: 510.47.03    CUDA Version: 11.6     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  Tesla T4            Off  | 00000000:00:03.0 Off |                    0 |
+| N/A   34C    P0    25W /  70W |      0MiB / 15360MiB |     10%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+(pytorch-pip) [root@10-9-151-144 HumanFace]# ls
+celeba  celeba.backup  celeba_dataset  celebadataset.py  Discriminator.py  img_align_celeba  looking_data.py  main.py  __pycache__
+(pytorch-pip) [root@10-9-151-144 HumanFace]# nvidia-smi 
+Thu May 26 21:28:07 2022       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 510.47.03    Driver Version: 510.47.03    CUDA Version: 11.6     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  Tesla T4            Off  | 00000000:00:03.0 Off |                    0 |
+| N/A   54C    P0    71W /  70W |   1367MiB / 15360MiB |     95%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|    0   N/A  N/A     28466      C   python3                          1365MiB |
++-----------------------------------------------------------------------------+
+(pytorch-pip) [root@10-9-151-144 HumanFace]# 
+
+```
+
