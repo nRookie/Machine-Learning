@@ -29,8 +29,8 @@ class CelebADataset(Dataset):
     pass
 
 
-hdf5_file = '/root/neural/HumanFace/celeba_dataset/celeba_aligned_small.h5py'
+# hdf5_file = '/root/neural/HumanFace/celeba_dataset/celeba_aligned_small.h5py'
 
-celeba_dataset = CelebADataset(hdf5_file)
-celeba_dataset.plot_image(33)
-plt.show()
+# celeba_dataset = CelebADataset(hdf5_file)
+# celeba_dataset.plot_image(33)
+# plt.show()
