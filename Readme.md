@@ -85,3 +85,30 @@ https://discuss.pytorch.org/t/pytorch-cuda-11-6/149647
 
 # celebA
 https://www.pythonfixing.com/2022/02/fixed-dataset-not-found-or-corrupted.html
+
+
+
+
+## cuda not enabled
+
+``` shell
+conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
+```
+
+
+
+
+
+## RuntimeError: Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu! (when checking a
+
+### move code to cuda
+``` python
+if torch.cuda.is_available():
+  torch.set_default_tensor_type(torch.cuda.FloatTensor)
+  print("using cuda:", torch.cuda.get_device_name(0))
+  pass
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+D.to(device)
+```

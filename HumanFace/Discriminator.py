@@ -95,13 +95,22 @@ D = Discriminator()
 
 hdf5_file = '/root/neural/HumanFace/celeba_dataset/celeba_aligned_small.h5py'
 
+if torch.cuda.is_available():
+  torch.set_default_tensor_type(torch.cuda.FloatTensor)
+  print("using cuda:", torch.cuda.get_device_name(0))
+  pass
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+D.to(device)
+
 celeba_dataset = CelebADataset(hdf5_file)
 
-for image_Data_tensor in celeba_dataset:
+for image_data_tensor in celeba_dataset:
     # real data
-    D.train(image_data_tensor, torch.FloatTensor([1.0]))
+    D.train(image_data_tensor, torch.cuda.FloatTensor([1.0]))
     # fake data
-    D.train(generate_random_image((218, 178, 3)), torch.FloatTensor([0.0]))
+    D.train(generate_random_image((218, 178, 3)), torch.cuda.FloatTensor([0.0]))
     pass
 
 D.plot_progress()
