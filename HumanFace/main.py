@@ -79,7 +79,7 @@ for epoch in range(epochs):
 
         # train discriminator on false
         # use detach() so gradients in G are not calculated
-        D.train(G.forward(generate_random_seed(100)).detach(), torch.cuda.FloatTensor([0,0]))
+        D.train(G.forward(generate_random_seed(100)).detach(), torch.cuda.FloatTensor([0.0]))
 
         # train generator
         G.train(D, generate_random_seed(100), torch.cuda.FloatTensor([1.0]))
